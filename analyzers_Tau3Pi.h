@@ -36,7 +36,7 @@ namespace FCCAnalyses :: VertexAnalysis {
     const double TAU_MASS = 1.77693;
     const double c = 299792458; // m/s
 
-    ///// Computes the mass of the tau at the MC level /////  
+    /* Computes the mass of the tau at the MC level */  
     std::pair<double,double> TauMassMC(const double Et, const double M,
                                        const double rx, const double ry, const double rz,
                                        const double px, const double py, const double pz) {
@@ -56,7 +56,7 @@ namespace FCCAnalyses :: VertexAnalysis {
         return {std::sqrt(A - B - C - D), std::acos(cb)}; //returns both the mass and the angle (beta)
     }
 
-    ///// Computes the reconstructed tau mass /////  
+    /* Computes the reconstructed tau mass */  
     std::pair<double,double> TauMass(const VertexingUtils::FCCAnalysesVertex& vertex,
                                      const float vx, const float vy, const float vz,
                                      const float BS_x, const float BS_y, const float BS_z) {
@@ -97,8 +97,8 @@ namespace FCCAnalyses :: VertexAnalysis {
         return {std::sqrt(A - B - C - D), std::acos(cb)};
     }
 
-    ///// Computes the reconstructed tau mass, but using the MC values for 4-momentum of the 3pi. /////
-    ///// Used to study the impact of the 3pi reconstruction on the final value of tau mass       /////
+    /* Computes the reconstructed tau mass, but using the MC values for 4-momentum of the 3pi.
+       Used to study the impact of the 3pi reconstruction on the final value of tau mass */
     std::pair<double,double> TauMass(const float px, const float py, const float pz, // MC values
                                      const double m3pi_MC, // MC value
                                      const float vx, const float vy, const float vz,
@@ -127,8 +127,8 @@ namespace FCCAnalyses :: VertexAnalysis {
         return {std::sqrt(A - B - C - D), std::acos(cb)};
     }
 
-    ///// Computes the 3pi 3-momentum at vertex after the vertex fit. /////
-    ///// Used to extract the components of the 3-pion system         /////
+    /* Computes the 3pi 3-momentum at vertex after the vertex fit.
+       Used to extract the components of the 3-pion system */
     TVector3 TauVertexMomentum(const FCCAnalyses::VertexingUtils::FCCAnalysesVertex& v) {
         TVector3 p;
         for (const auto& p_tr : v.updated_track_momentum_at_vertex) {
@@ -137,21 +137,21 @@ namespace FCCAnalyses :: VertexAnalysis {
         return p;
     }
 
-    ///// Estimator of the primary vertex (PV) constrained by the beam spot resolution.        /////
-    ///// Check that the sigmas are properly passed in mm (they are typically reported in um), /////
-    ///// since v1 and v2 are in mm                                                            /////
+    /* Estimator of the primary vertex (PV) constrained by the beam spot resolution.
+       Check that the sigmas are properly passed in mm (they are typically reported in um),
+       since v1 and v2 are in mm */
     inline edm4hep::Vector3f EstimatePV(const float v1_x, const float v1_y, const float v1_z,
                                         const float v2_x, const float v2_y, const float v2_z,
                                         const float sig_x, const float sig_y, const float sig_z) {   
-        // direction vector between the two decay vertices
+        // Direction vector between the two decay vertices
         edm4hep::Vector3f d = {v2_x - v1_x, v2_y - v1_y, v2_z - v1_z};
 
-        // weights set by the beam spot constraints
+        // Weights set by the beam spot constraints
         float wx = 1.0/(sig_x*sig_x);
         float wy = 1.0/(sig_y*sig_y);
         float wz = 1.0/(sig_z*sig_z);
 
-        // numerator and denominator from optimization (derivative of chi^2)
+        // Numerator and denominator from optimization (derivative of chi^2)
         float num = wx*v1_x*d.x + wy*v1_y*d.y + wz*v1_z*d.z;
         float den = wx*d.x*d.x + wy*d.y*d.y + wz*d.z*d.z;
 
@@ -160,7 +160,7 @@ namespace FCCAnalyses :: VertexAnalysis {
         return {v1_x + t*d.x, v1_y + t*d.y, v1_z + t*d.z};
     }
 
-    ///// Computes the SUM of the two taus lifetimes' in an event, given both SV /////
+    /* Computes the SUM of the two taus lifetimes' in an event, given both SV */
     double TauLifetime(const float SV1_x, const float SV1_y, const float SV1_z,
                        const float SV2_x, const float SV2_y, const float SV2_z) {
         const double lambda_tau = std::sqrt( (SV1_x - SV2_x)*(SV1_x - SV2_x) + (SV1_y - SV2_y)*(SV1_y - SV2_y) + (SV1_z - SV2_z)*(SV1_z - SV2_z) ) / 1000; // flight distance of the tau in mm
@@ -168,7 +168,7 @@ namespace FCCAnalyses :: VertexAnalysis {
         return ( ( (lambda_tau * TAU_MASS) / std::sqrt( E_TAU*E_TAU - TAU_MASS*TAU_MASS) ) / c) * 1e15; // lifetime in fs
     }
     
-    ///// Computes the post-vertex-fit mass of the 3-pion system /////
+    /* Computes the post-vertex-fit mass of the 3-pion system */
     double tau3pi_vertex_mass(const VertexingUtils::FCCAnalysesVertex& vertex) {
         TLorentzVector tau;
 
@@ -188,7 +188,7 @@ namespace FCCAnalyses :: VertexAnalysis {
         return tau.M();
     }
 
-    ///// Computes the pre-vertex-fit mass of the 3-pion system /////
+    /* Computes the pre-vertex-fit mass of the 3-pion system */
     double tau3pi_raw_mass(const ROOT::VecOps::RVec<edm4hep::ReconstructedParticleData>& legs) {
         TLorentzVector tau;
         
@@ -204,7 +204,7 @@ namespace FCCAnalyses :: VertexAnalysis {
         return tau.M();
     }
 
-    ///// Computes the mass of the 3-pion system at the MC level /////
+    /* Computes the mass of the 3-pion system at the MC level */
     double tau3pi_MC_mass(const ROOT::VecOps::RVec<int>& indices, const ROOT::VecOps::RVec<edm4hep::MCParticleData>& parts) {
         ROOT::Math::PxPyPzMVector tau;
         
